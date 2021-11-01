@@ -41,11 +41,9 @@
     "configuration": {
       "title": "cppcheck",
       "properties": {
-        "lizard.ccn": {
-          "type": "number",
-          "default": 0,
-          "description": "The maximum modified cyclomatic complexity value for a function. Set this to 0 to disable scanning CCN.",
-          "minimum": 0
+        "cppcheck.project": {
+          "type": "string",
+          "description": "The path to a project file such as compile_commands.json or a VS solution file."
         },
         "lizard.length": {
           "type": "number",
