@@ -1,0 +1,99 @@
+{
+  "name": "vscode-cppcheck",
+  "publisher": "brobeson",
+  "displayName": "Cppcheck",
+  "description": "Run Cppcheck on your code.",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.43.0"
+  },
+  "license": "SEE LICENSE IN license.md.",
+  "categories": [
+    "Linters"
+  ],
+  "keywords": [
+    "cpp",
+    "c",
+    "cppcheck"
+  ],
+  "preview": true,
+  "activationEvents": [
+    "onLanguage:cpp",
+    "onLanguage:c"
+  ],
+  "bugs": {
+    "url": "https://github.com/brobeson/vscode-cppcheck/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brobeson/vscode-cppcheck/"
+  },
+  "homepage": "https://github.com/brobeson/vscode-cppcheck/blob/main/README.md",
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cppcheck.scanActiveFile",
+        "title": "Scan the Current File",
+        "category": "Cppcheck"
+      }
+    ],
+    "configuration": {
+      "title": "cppcheck",
+      "properties": {
+        "lizard.ccn": {
+          "type": "number",
+          "default": 0,
+          "description": "The maximum modified cyclomatic complexity value for a function. Set this to 0 to disable scanning CCN.",
+          "minimum": 0
+        },
+        "lizard.length": {
+          "type": "number",
+          "default": 0,
+          "description": "The maximum length of a function. Set this to 0 to disable scanning function length.",
+          "minimum": 0
+        },
+        "lizard.arguments": {
+          "type": "number",
+          "default": 0,
+          "description": "The maximum number of arguments for a function. Set this to 0 to disable scanning function arguments",
+          "minimum": 0
+        },
+        "lizard.modified_ccn": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use modified CCN complexity analysis. This treats switch statements as having CCN 1 regardless of the number of cases."
+        },
+        "lizard.whitelist": {
+          "type": "string",
+          "description": "The path to a white list file. If this is not set, the Lizard default is used."
+        },
+        "lizard.extensions": {
+          "type": "array",
+          "description": "A list of Lizard extensions to include on the command line. See the Lizard documentation for information about available extensions."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint src --ext ts",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^7.0.1",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.43.0",
+    "eslint": "^6.8.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "glob": "^7.1.6",
+    "mocha": "^7.0.1",
+    "typescript": "^3.7.5",
+    "vscode-test": "^1.3.0"
+  }
+}
