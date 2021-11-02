@@ -39,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
   //   saved first.
   // TODO Can Cppcheck lint the document before saving?
   context.subscriptions.push(
-    vscode.commands.registerCommand('cppcheck.scanActiveFile', check_active_document));
+    vscode.commands.registerCommand('cppcheck.scanProject', check_active_document));
   // context.subscriptions.push(
   //   vscode.workspace.onDidOpenTextDocument(check_active_document));
   // context.subscriptions.push(

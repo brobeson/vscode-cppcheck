@@ -33,42 +33,41 @@
   "contributes": {
     "commands": [
       {
-        "command": "cppcheck.scanActiveFile",
-        "title": "Scan the Current File",
+        "command": "cppcheck.scanProject",
+        "title": "Scan the Whole Project",
         "category": "Cppcheck"
       }
     ],
     "configuration": {
       "title": "cppcheck",
       "properties": {
-        "cppcheck.project": {
+        "cppcheck.elevateSeverity": {
           "type": "string",
-          "description": "The path to a project file such as compile_commands.json or a VS solution file."
+          "description": "Elevate all Cppcheck messages to the specified level. Messages above this level are left alone.",
+          "enum": [
+            "error",
+            "no elevation",
+            "warning"
+          ],
+          "enumDescriptions": [
+            "Treat Cppcheck warning, style, performance, and portability messages as errors",
+            "Treat Cppcheck style, performance, and portability messages as information.",
+            "Treat Cppcheck style, performance, and portability messages as warnings"
+          ],
+          "default": "no elevation"
         },
-        "lizard.length": {
-          "type": "number",
-          "default": 0,
-          "description": "The maximum length of a function. Set this to 0 to disable scanning function length.",
-          "minimum": 0
-        },
-        "lizard.arguments": {
-          "type": "number",
-          "default": 0,
-          "description": "The maximum number of arguments for a function. Set this to 0 to disable scanning function arguments",
-          "minimum": 0
-        },
-        "lizard.modified_ccn": {
-          "type": "boolean",
-          "default": false,
-          "description": "Use modified CCN complexity analysis. This treats switch statements as having CCN 1 regardless of the number of cases."
-        },
-        "lizard.whitelist": {
-          "type": "string",
-          "description": "The path to a white list file. If this is not set, the Lizard default is used."
-        },
-        "lizard.extensions": {
+        "cppcheck.commandArguments": {
           "type": "array",
-          "description": "A list of Lizard extensions to include on the command line. See the Lizard documentation for information about available extensions."
+          "markdownDescription": "Command line arguments to pass to Cppcheck. **WARNING** This extension removes some arguments from the list. For example, `--template` is removed because the extension requires a specific template to parse the output.",
+          "default": [
+            "--enable=all",
+            "--quiet",
+            "--project=../build/compile_commands.json"
+          ],
+          "additionalProperties": false,
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

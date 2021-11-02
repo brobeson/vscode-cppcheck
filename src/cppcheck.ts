@@ -109,34 +109,13 @@ function run_cppcheck(
 // }
 
 function make_cppcheck_command(file: string | undefined) {
-  // TODO Make these settings for the extension.
-  let command_arguments: string[] = ["--enable=all",
-    "--project=../build/compile_commands.json",
-    "--template={file}-:-{line}-:-{column}-:-{severity}-:-{id}-:-{message}",
-    "--quiet"
-  ];
-  // const configuration = vscode.workspace.getConfiguration("cppcheck");
-  // if (configuration.has("project") && configuration.get()) {
-  //   command_arguments.push(`--project=${configuration.get("project")}`)
-  // }
-  // if (limits.modified) {
-  //   command_arguments.push("--modified");
-  // }
-  // if (limits.ccn !== 0) {
-  //   command_arguments.push(`--CCN=${limits.ccn}`);
-  // }
-  // if (limits.length !== 0) {
-  //   command_arguments.push(`--length=${limits.length}`);
-  // }
-  // if (limits.arguments !== 0) {
-  //   command_arguments.push(`--arguments=${limits.arguments}`);
-  // }
-  // if (limits.whitelist !== "") {
-  //   command_arguments.push(`--whitelist=${limits.whitelist}`);
-  // }
-  // for (const extension of limits.extensions) {
-  //   command_arguments.push(`--extension=${extension}`);
-  // }
+  let command_arguments: string[] = [];
+  const configuration = vscode.workspace.getConfiguration("cppcheck");
+  if (configuration.has("commandArguments")) {
+    command_arguments = configuration.get("commandArguments") as string[];
+  }
+  command_arguments = command_arguments.filter(argument => !argument.startsWith("--template"));
+  command_arguments.push("--template={file}-:-{line}-:-{column}-:-{severity}-:-{id}-:-{message}");
   if (file !== undefined) {
     command_arguments.push(file);
   }
@@ -258,7 +237,7 @@ function cppcheck_severity_to_vscode_severity(cppcheck_severity: string): vscode
 // function extract_details(line: string): Details {
 //   return new Details(
 //     line.split("-:-")[2],
-//     parseInt(line.split(":")[1]) - 1,
+//     parseInt(line.split(":")[1]) - 1,cppcheck
 //     extract_value(line, /[0-9]+ CCN/),
 //     extract_value(line, /[0-9]+ length/),
 //     extract_value(line, /[0-9]+ PARAM/)
