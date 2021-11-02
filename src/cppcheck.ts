@@ -1,37 +1,12 @@
 import { spawn } from 'child_process';
 import { readFileSync } from 'fs';
-import { get } from 'https';
 import * as vscode from 'vscode';
-import { MessageChannel } from 'worker_threads';
-
-// export class Configuration {
-//   readonly ccn: number;
-//   readonly length: number;
-//   readonly arguments: number;
-//   readonly modified: boolean;
-//   readonly whitelist: string;
-//   readonly extensions: string[];
-//   constructor(ccn: number,
-//     length: number,
-//     parameters: number,
-//     modified: boolean,
-//     whitelist: string,
-//     extensions: string[]) {
-//     this.ccn = ccn;
-//     this.length = length;
-//     this.arguments = parameters;
-//     this.modified = modified;
-//     this.whitelist = whitelist;
-//     this.extensions = extensions;
-//   }
-// }
 
 export async function lint_whole_project(log_channel: vscode.OutputChannel) {
   return create_diagnostics_for_all_output(await run_cppcheck(undefined, log_channel));
 }
 
 export async function lint_active_document(
-  working_directory: string,
   log_channel: vscode.OutputChannel) {
   if (vscode.window.activeTextEditor === undefined) {
     return { document: undefined, diagnostics: [] };
@@ -63,27 +38,16 @@ function run_cppcheck(
       : vscode.workspace.workspaceFolders[0].uri.fsPath;
     const process = spawn(cppcheck, command_arguments, { "cwd": working_directory });
     if (process.pid) {
-      let stdout = "";
       let stderr = "";
       process.stdout.on("data", data => {
         log_channel.appendLine(data);
-        // stdout += data;
       });
-      // process.stdout.on("end", () => {
-      //   // log_channel.appendLine(stdout);
-      //   resolve(stdout);
-      // });
       process.stderr.on("data", data => {
         log_channel.appendLine(data);
         stderr += data;
       });
       process.stderr.on("end", () => {
         resolve(stderr);
-        // if (stderr.length > 0) {
-        //   const exception_message = extract_exception_message(stderr);
-        //   vscode.window.showErrorMessage(
-        //     `Cppcheck failed; here's the exception message:\n${exception_message}`);
-        // }
       });
       process.on("error", err => {
         log_channel.appendLine(err.message);
@@ -95,11 +59,6 @@ function run_cppcheck(
     }
   });
 }
-
-// function extract_exception_message(process_output: string): string {
-//   const lines = process_output.trim().split('\n');
-//   return lines[lines.length - 1];
-// }
 
 function make_cppcheck_command(file: string | undefined) {
   let command_arguments: string[] = [];
@@ -118,7 +77,6 @@ function make_cppcheck_command(file: string | undefined) {
 function create_diagnostics_for_all_output(process_output: string) {
   const lines = process_output.trim().split('\n');
   let diagnostics = [];
-  // let diagnostics = new ReadOnlyArray<
   for (const line of lines) {
     if (line.startsWith("nofile")) {
       vscode.window.showWarningMessage(line.replace(/.*-:-/, ""));
@@ -129,23 +87,6 @@ function create_diagnostics_for_all_output(process_output: string) {
   }
   return diagnostics;
 }
-
-// class Details {
-//   readonly full_function_name: string; // Function name with namespaces.
-//   readonly function_name: string; // Function name without namespaces.
-//   readonly line_number: number;
-//   readonly ccn: number;
-//   readonly length: number;
-//   readonly arguments: number;
-//   constructor(full_function_name: string, line_number: number, ccn: number, length: number, parameters: number) {
-//     this.full_function_name = full_function_name;
-//     this.function_name = extract_function_name(full_function_name);
-//     this.line_number = line_number;
-//     this.ccn = ccn;
-//     this.length = length;
-//     this.arguments = parameters;
-//   }
-// }
 
 function extract_function_name(cppcheck_message: string): string {
   if (cppcheck_message.startsWith("The function '")) {
@@ -159,7 +100,6 @@ function extract_function_name(cppcheck_message: string): string {
 }
 
 function create_diagnostic_for_one_line(line: string, elevation: string): [vscode.Uri, vscode.Diagnostic[]] {
-  // let diagnostics: vscode.Diagnostic[] = [];
   const details = line.split("-:-");
   const function_name = extract_function_name(details[5]);
   const line_index = Math.max(0, parseInt(details[1]) - 1);
@@ -173,16 +113,6 @@ function create_diagnostic_for_one_line(line: string, elevation: string): [vscod
   diagnostic.code = `${details[4]}`;
   diagnostic.source = "Cppcheck";
   return [vscode.Uri.file(details[0]), [diagnostic]];
-  // if (limits.ccn !== undefined && details.ccn > limits.ccn) {
-  //   diagnostics.push(create_ccn_diagnostic(details, file, limits.ccn));
-  // }
-  // if (limits.length !== undefined && details.length > limits.length) {
-  //   diagnostics.push(create_length_diagnostic(details, file, limits.length));
-  // }
-  // if (limits.arguments !== undefined && details.arguments > limits.arguments) {
-  //   diagnostics.push(create_parameters_diagnostic(details, file, limits.arguments));
-  // }
-  // return diagnostics;
 }
 
 function cppcheck_severity_to_vscode_severity(cppcheck_severity: string, elevation: string): vscode.DiagnosticSeverity {
@@ -194,49 +124,6 @@ function cppcheck_severity_to_vscode_severity(cppcheck_severity: string, elevati
   }
   return vscode.DiagnosticSeverity.Information;
 }
-
-// function create_ccn_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
-//   return new vscode.Diagnostic(
-//     details.function_name === "*global*"
-//       ? new vscode.Range(0, 0, file.lineCount, 0)
-//       : get_function_range(details, file),
-//     details.function_name === "*global*"
-//       ? `The global scope has ${details.ccn} CCN; the maximum is ${limit}.`
-//       : `${details.function_name} has ${details.ccn} CCN; the maximum is ${limit}.`,
-//     vscode.DiagnosticSeverity.Warning);
-// }
-
-// function create_length_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
-//   return new vscode.Diagnostic(
-//     details.function_name === "*global*"
-//       ? new vscode.Range(0, 0, file.lineCount, 0)
-//       : get_function_range(details, file),
-//     details.function_name === "*global*"
-//       ? `The global scope has ${details.length} length; the maximum is ${limit}.`
-//       : `${details.function_name} has ${details.length} length; the maximum is ${limit}.`,
-//     vscode.DiagnosticSeverity.Warning);
-// }
-
-// function create_parameters_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
-//   return new vscode.Diagnostic(
-//     details.function_name === "*global*"
-//       ? new vscode.Range(0, 0, file.lineCount, 0)
-//       : get_function_range(details, file),
-//     details.function_name === "*global*"
-//       ? `The global scope has ${details.arguments} parameters; the maximum is ${limit}.`
-//       : `${details.function_name} has ${details.arguments} parameters; the maximum is ${limit}.`,
-//     vscode.DiagnosticSeverity.Warning);
-// }
-
-// function extract_details(line: string): Details {
-//   return new Details(
-//     line.split("-:-")[2],
-//     parseInt(line.split(":")[1]) - 1,cppcheck
-//     extract_value(line, /[0-9]+ CCN/),
-//     extract_value(line, /[0-9]+ length/),
-//     extract_value(line, /[0-9]+ PARAM/)
-//   );
-// }
 
 function get_function_range(
   line_index: number,
@@ -256,11 +143,3 @@ function get_function_range(
     line_index,
     start_character + function_name.length);
 }
-
-// function extract_value(text: string, parameter_regex: RegExp) {
-//   let matches = text.match(parameter_regex);
-//   if (matches === null) {
-//     return 0;
-//   }
-//   return parseInt(matches[0].split(' ')[0]);
-// }
