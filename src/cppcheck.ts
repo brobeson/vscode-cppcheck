@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import { readFileSync } from 'fs';
 import { get } from 'https';
 import * as vscode from 'vscode';
 import { MessageChannel } from 'worker_threads';
@@ -102,10 +103,10 @@ function run_cppcheck(
   });
 }
 
-function extract_exception_message(process_output: string): string {
-  const lines = process_output.trim().split('\n');
-  return lines[lines.length - 1];
-}
+// function extract_exception_message(process_output: string): string {
+//   const lines = process_output.trim().split('\n');
+//   return lines[lines.length - 1];
+// }
 
 function make_cppcheck_command(file: string | undefined) {
   // TODO Make these settings for the extension.
@@ -147,8 +148,8 @@ function create_diagnostics_for_all_output(process_output: string, file: vscode.
   let diagnostics = [];
   // let diagnostics = new ReadOnlyArray<
   for (const line of lines) {
-    if (line.startsWith("(information)")) {
-      vscode.window.showWarningMessage(line.replace("(information) ", ""));
+    if (line.startsWith("nofile")) {
+      vscode.window.showWarningMessage(line.replace(/.*-:-/, ""));
     } else {
       diagnostics.push(create_diagnostic_for_one_line(line, file));
     }
@@ -156,22 +157,22 @@ function create_diagnostics_for_all_output(process_output: string, file: vscode.
   return diagnostics;
 }
 
-class Details {
-  readonly full_function_name: string; // Function name with namespaces.
-  readonly function_name: string; // Function name without namespaces.
-  readonly line_number: number;
-  readonly ccn: number;
-  readonly length: number;
-  readonly arguments: number;
-  constructor(full_function_name: string, line_number: number, ccn: number, length: number, parameters: number) {
-    this.full_function_name = full_function_name;
-    this.function_name = extract_function_name(full_function_name);
-    this.line_number = line_number;
-    this.ccn = ccn;
-    this.length = length;
-    this.arguments = parameters;
-  }
-}
+// class Details {
+//   readonly full_function_name: string; // Function name with namespaces.
+//   readonly function_name: string; // Function name without namespaces.
+//   readonly line_number: number;
+//   readonly ccn: number;
+//   readonly length: number;
+//   readonly arguments: number;
+//   constructor(full_function_name: string, line_number: number, ccn: number, length: number, parameters: number) {
+//     this.full_function_name = full_function_name;
+//     this.function_name = extract_function_name(full_function_name);
+//     this.line_number = line_number;
+//     this.ccn = ccn;
+//     this.length = length;
+//     this.arguments = parameters;
+//   }
+// }
 
 function extract_function_name(cppcheck_message: string): string {
   if (cppcheck_message.startsWith("The function '")) {
@@ -188,10 +189,11 @@ function create_diagnostic_for_one_line(line: string, file: vscode.TextDocument)
   // let diagnostics: vscode.Diagnostic[] = [];
   const details = line.split("-:-");
   const function_name = extract_function_name(details[5]);
-  const line_number = parseInt(details[1]);
-  const column = parseInt(details[2]);
+  const line_index = Math.max(0, parseInt(details[1]) - 1);
+  const column_index = Math.max(0, parseInt(details[2]) - 1);
+  const code_line = readFileSync(details[0], "utf-8").split("\n")[line_index];
   let diagnostic = new vscode.Diagnostic(
-    get_function_range(line_number, column, function_name, file),
+    get_function_range(line_index, column_index, function_name, code_line),
     details[5],
     cppcheck_severity_to_vscode_severity(details[3])
   );
@@ -220,79 +222,72 @@ function cppcheck_severity_to_vscode_severity(cppcheck_severity: string): vscode
   return vscode.DiagnosticSeverity.Information;
 }
 
-function create_ccn_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
-  return new vscode.Diagnostic(
-    details.function_name === "*global*"
-      ? new vscode.Range(0, 0, file.lineCount, 0)
-      : get_function_range(details, file),
-    details.function_name === "*global*"
-      ? `The global scope has ${details.ccn} CCN; the maximum is ${limit}.`
-      : `${details.function_name} has ${details.ccn} CCN; the maximum is ${limit}.`,
-    vscode.DiagnosticSeverity.Warning);
-}
+// function create_ccn_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
+//   return new vscode.Diagnostic(
+//     details.function_name === "*global*"
+//       ? new vscode.Range(0, 0, file.lineCount, 0)
+//       : get_function_range(details, file),
+//     details.function_name === "*global*"
+//       ? `The global scope has ${details.ccn} CCN; the maximum is ${limit}.`
+//       : `${details.function_name} has ${details.ccn} CCN; the maximum is ${limit}.`,
+//     vscode.DiagnosticSeverity.Warning);
+// }
 
-function create_length_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
-  return new vscode.Diagnostic(
-    details.function_name === "*global*"
-      ? new vscode.Range(0, 0, file.lineCount, 0)
-      : get_function_range(details, file),
-    details.function_name === "*global*"
-      ? `The global scope has ${details.length} length; the maximum is ${limit}.`
-      : `${details.function_name} has ${details.length} length; the maximum is ${limit}.`,
-    vscode.DiagnosticSeverity.Warning);
-}
+// function create_length_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
+//   return new vscode.Diagnostic(
+//     details.function_name === "*global*"
+//       ? new vscode.Range(0, 0, file.lineCount, 0)
+//       : get_function_range(details, file),
+//     details.function_name === "*global*"
+//       ? `The global scope has ${details.length} length; the maximum is ${limit}.`
+//       : `${details.function_name} has ${details.length} length; the maximum is ${limit}.`,
+//     vscode.DiagnosticSeverity.Warning);
+// }
 
-function create_parameters_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
-  return new vscode.Diagnostic(
-    details.function_name === "*global*"
-      ? new vscode.Range(0, 0, file.lineCount, 0)
-      : get_function_range(details, file),
-    details.function_name === "*global*"
-      ? `The global scope has ${details.arguments} parameters; the maximum is ${limit}.`
-      : `${details.function_name} has ${details.arguments} parameters; the maximum is ${limit}.`,
-    vscode.DiagnosticSeverity.Warning);
-}
+// function create_parameters_diagnostic(details: Details, file: vscode.TextDocument, limit: number) {
+//   return new vscode.Diagnostic(
+//     details.function_name === "*global*"
+//       ? new vscode.Range(0, 0, file.lineCount, 0)
+//       : get_function_range(details, file),
+//     details.function_name === "*global*"
+//       ? `The global scope has ${details.arguments} parameters; the maximum is ${limit}.`
+//       : `${details.function_name} has ${details.arguments} parameters; the maximum is ${limit}.`,
+//     vscode.DiagnosticSeverity.Warning);
+// }
 
-function extract_details(line: string): Details {
-  return new Details(
-    line.split("-:-")[2],
-    parseInt(line.split(":")[1]) - 1,
-    extract_value(line, /[0-9]+ CCN/),
-    extract_value(line, /[0-9]+ length/),
-    extract_value(line, /[0-9]+ PARAM/)
-  );
-}
+// function extract_details(line: string): Details {
+//   return new Details(
+//     line.split("-:-")[2],
+//     parseInt(line.split(":")[1]) - 1,
+//     extract_value(line, /[0-9]+ CCN/),
+//     extract_value(line, /[0-9]+ length/),
+//     extract_value(line, /[0-9]+ PARAM/)
+//   );
+// }
 
-function get_function_range(line_number: number, column: number, function_name: string, file: vscode.TextDocument): vscode.Range {
+function get_function_range(
+  line_index: number,
+  column_index: number,
+  function_name: string,
+  code_line: string): vscode.Range {
   if (function_name === "") {
-    return new vscode.Range(
-      line_number > 0 ? line_number - 1 : line_number,
-      column > 0 ? column - 1 : column,
-      line_number > 0 ? line_number - 1 : line_number,
-      column > 0 ? column - 1 : column);
+    return new vscode.Range(line_index, column_index, line_index, column_index);
   }
-  // BUG 'file' is not necessarily the current file open in the editor. This
-  // causes a runtime error.
-  const line_text = file.lineAt(line_number - 1).text;
-  const start_character = line_text.indexOf(function_name);
+  const start_character = code_line.indexOf(function_name);
   if (start_character < 0) {
-    return new vscode.Range(
-      line_number > 0 ? line_number - 1 : line_number,
-      column > 0 ? column - 1 : column,
-      line_number > 0 ? line_number - 1 : line_number,
-      column > 0 ? column - 1 : column);
+    return new vscode.Range(line_index, column_index, line_index, column_index);
   }
   return new vscode.Range(
-    line_number - 1,
+    line_index,
     start_character,
-    line_number - 1,
+    line_index,
     start_character + function_name.length);
 }
 
-function extract_value(text: string, parameter_regex: RegExp) {
-  let matches = text.match(parameter_regex);
-  if (matches === null) {
-    return 0;
-  }
-  return parseInt(matches[0].split(' ')[0]);
-}
+// function extract_value(text: string, parameter_regex: RegExp) {
+//   let matches = text.match(parameter_regex);
+//   if (matches === null) {
+//     return 0;
+//   }
+//   return parseInt(matches[0].split(' ')[0]);
+// }
