@@ -36,18 +36,10 @@ export function activate(context: vscode.ExtensionContext) {
     diagnostics.set(diagnostic_list);
   }
 
-  // List of events that can't be used:
-  // - onDidChangeTextDocument: Cppcheck reads the file from disk; it must be
-  //   saved first.
-  // TODO Can Cppcheck lint the document before saving?
   context.subscriptions.push(
     vscode.commands.registerCommand('cppcheck.scanProject', check_whole_project));
-  // context.subscriptions.push(
-  //   vscode.workspace.onDidOpenTextDocument(check_active_document));
-  // context.subscriptions.push(
-  //   vscode.workspace.onDidSaveTextDocument(check_active_document));
-  // context.subscriptions.push(
-  //   vscode.workspace.onDidCloseTextDocument(doc => diagnostics.delete(doc.uri)));
+  context.subscriptions.push(
+    vscode.workspace.onDidSaveTextDocument(check_whole_project));
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(config => {
       if (config.affectsConfiguration('cppcheck')) {
