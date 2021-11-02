@@ -1,5 +1,7 @@
 import { spawn } from 'child_process';
+import { get } from 'https';
 import * as vscode from 'vscode';
+import { MessageChannel } from 'worker_threads';
 
 // export class Configuration {
 //   readonly ccn: number;
@@ -171,28 +173,25 @@ class Details {
   }
 }
 
-function extract_function_name(full_function_name: string): string {
-  if (full_function_name === "*global*") {
-    return full_function_name;
+function extract_function_name(cppcheck_message: string): string {
+  if (cppcheck_message.startsWith("The function '")) {
+    const index = cppcheck_message.indexOf("'", 14);
+    if (index === undefined) {
+      return "";
+    }
+    return cppcheck_message.substr(14, index - 14);
   }
-  const index = full_function_name.lastIndexOf(":");
-  if (index === undefined) {
-    return full_function_name;
-  }
-  return full_function_name.substr(index + 1);
+  return "";
 }
 
 function create_diagnostic_for_one_line(line: string, file: vscode.TextDocument): [vscode.Uri, vscode.Diagnostic[]] {
   // let diagnostics: vscode.Diagnostic[] = [];
   const details = line.split("-:-");
+  const function_name = extract_function_name(details[5]);
   const line_number = parseInt(details[1]);
   const column = parseInt(details[2]);
   let diagnostic = new vscode.Diagnostic(
-    new vscode.Range(
-      line_number > 0 ? line_number - 1 : line_number,
-      column > 0 ? column - 1 : column,
-      line_number > 0 ? line_number - 1 : line_number,
-      column > 0 ? column - 1 : column),
+    get_function_range(line_number, column, function_name, file),
     details[5],
     cppcheck_severity_to_vscode_severity(details[3])
   );
@@ -264,19 +263,30 @@ function extract_details(line: string): Details {
   );
 }
 
-function get_function_range(details: Details, file: vscode.TextDocument): vscode.Range {
-  const line_text = file.lineAt(details.line_number).text;
-  const start_character = line_text.lastIndexOf(details.function_name);
-  if (start_character >= line_text.length) {
-    return new vscode.Range(details.line_number, 0, details.line_number, 0);
+function get_function_range(line_number: number, column: number, function_name: string, file: vscode.TextDocument): vscode.Range {
+  if (function_name === "") {
+    return new vscode.Range(
+      line_number > 0 ? line_number - 1 : line_number,
+      column > 0 ? column - 1 : column,
+      line_number > 0 ? line_number - 1 : line_number,
+      column > 0 ? column - 1 : column);
   }
-  const range = file.getWordRangeAtPosition(
-    new vscode.Position(details.line_number, start_character),
-    RegExp(details.function_name));
-  if (range === undefined) {
-    return new vscode.Range(details.line_number, 0, details.line_number, 0);
+  // BUG 'file' is not necessarily the current file open in the editor. This
+  // causes a runtime error.
+  const line_text = file.lineAt(line_number - 1).text;
+  const start_character = line_text.indexOf(function_name);
+  if (start_character < 0) {
+    return new vscode.Range(
+      line_number > 0 ? line_number - 1 : line_number,
+      column > 0 ? column - 1 : column,
+      line_number > 0 ? line_number - 1 : line_number,
+      column > 0 ? column - 1 : column);
   }
-  return range;
+  return new vscode.Range(
+    line_number - 1,
+    start_character,
+    line_number - 1,
+    start_character + function_name.length);
 }
 
 function extract_value(text: string, parameter_regex: RegExp) {
