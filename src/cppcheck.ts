@@ -130,7 +130,8 @@ function create_diagnostics_for_all_output(process_output: string, file: vscode.
     if (line.startsWith("nofile")) {
       vscode.window.showWarningMessage(line.replace(/.*-:-/, ""));
     } else {
-      diagnostics.push(create_diagnostic_for_one_line(line, file));
+      const elevation: string = vscode.workspace.getConfiguration("cppcheck").get("elevateSeverity") as string;
+      diagnostics.push(create_diagnostic_for_one_line(line, file, elevation));
     }
   }
   return diagnostics;
@@ -164,7 +165,7 @@ function extract_function_name(cppcheck_message: string): string {
   return "";
 }
 
-function create_diagnostic_for_one_line(line: string, file: vscode.TextDocument): [vscode.Uri, vscode.Diagnostic[]] {
+function create_diagnostic_for_one_line(line: string, file: vscode.TextDocument, elevation: string): [vscode.Uri, vscode.Diagnostic[]] {
   // let diagnostics: vscode.Diagnostic[] = [];
   const details = line.split("-:-");
   const function_name = extract_function_name(details[5]);
@@ -174,7 +175,7 @@ function create_diagnostic_for_one_line(line: string, file: vscode.TextDocument)
   let diagnostic = new vscode.Diagnostic(
     get_function_range(line_index, column_index, function_name, code_line),
     details[5],
-    cppcheck_severity_to_vscode_severity(details[3])
+    cppcheck_severity_to_vscode_severity(details[3], elevation)
   );
   diagnostic.code = `${details[4]}`;
   diagnostic.source = "Cppcheck";
@@ -191,11 +192,11 @@ function create_diagnostic_for_one_line(line: string, file: vscode.TextDocument)
   // return diagnostics;
 }
 
-function cppcheck_severity_to_vscode_severity(cppcheck_severity: string): vscode.DiagnosticSeverity {
-  if (cppcheck_severity === "error") {
+function cppcheck_severity_to_vscode_severity(cppcheck_severity: string, elevation: string): vscode.DiagnosticSeverity {
+  if (cppcheck_severity === "error" || elevation === "error") {
     return vscode.DiagnosticSeverity.Error;
   }
-  if (cppcheck_severity === "warning") {
+  if (cppcheck_severity === "warning" || elevation === "warning") {
     return vscode.DiagnosticSeverity.Warning;
   }
   return vscode.DiagnosticSeverity.Information;
