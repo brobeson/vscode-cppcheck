@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { lint_active_document, lint_document } from './cppcheck';
+import { lint_active_document, lint_document, lint_whole_project } from './cppcheck';
 
 export function activate(context: vscode.ExtensionContext) {
   let subscriptions = context.subscriptions;
@@ -8,30 +8,32 @@ export function activate(context: vscode.ExtensionContext) {
   let log_channel = vscode.window.createOutputChannel('Cppcheck');
   subscriptions.push(log_channel);
 
-  async function lizard_document(file: vscode.TextDocument) {
-    if (vscode.workspace.workspaceFolders === undefined) {
-      return;
-    }
-    const diag = await lint_document(
-      file,
-      vscode.workspace.workspaceFolders[0].uri.fsPath,
-      log_channel);
-    // diagnostics.set(file.uri, diag);
-  }
+  // async function lizard_document(file: vscode.TextDocument) {
+  //   if (vscode.workspace.workspaceFolders === undefined) {
+  //     return;
+  //   }
+  //   const diag = await lint_document(file, log_channel);
+  //   // diagnostics.set(file.uri, diag);
+  // }
 
-  async function check_active_document() {
-    if (vscode.window.activeTextEditor === undefined
-      || vscode.workspace.workspaceFolders === undefined) {
-      return;
-    }
-    const diag = await lint_active_document(
-      vscode.workspace.workspaceFolders[0].uri.fsPath,
-      log_channel);
-    // if (diag.document) {
-    //   diagnostics.set(diag.document.uri, diag.diagnostics);
-    // }
-    // @ts-ignore
-    diagnostics.set(diag);
+  // async function check_active_document() {
+  //   if (vscode.window.activeTextEditor === undefined
+  //     || vscode.workspace.workspaceFolders === undefined) {
+  //     return;
+  //   }
+  //   const diag = await lint_active_document(
+  //     vscode.workspace.workspaceFolders[0].uri.fsPath,
+  //     log_channel);
+  //   // if (diag.document) {
+  //   //   diagnostics.set(diag.document.uri, diag.diagnostics);
+  //   // }
+  //   // @ts-ignore
+  //   diagnostics.set(diag);
+  // }
+
+  async function check_whole_project() {
+    const diagnostic_list = await lint_whole_project(log_channel);
+    diagnostics.set(diagnostic_list);
   }
 
   // List of events that can't be used:
@@ -39,21 +41,19 @@ export function activate(context: vscode.ExtensionContext) {
   //   saved first.
   // TODO Can Cppcheck lint the document before saving?
   context.subscriptions.push(
-    vscode.commands.registerCommand('cppcheck.scanProject', check_active_document));
+    vscode.commands.registerCommand('cppcheck.scanProject', check_whole_project));
   // context.subscriptions.push(
   //   vscode.workspace.onDidOpenTextDocument(check_active_document));
   // context.subscriptions.push(
   //   vscode.workspace.onDidSaveTextDocument(check_active_document));
   // context.subscriptions.push(
   //   vscode.workspace.onDidCloseTextDocument(doc => diagnostics.delete(doc.uri)));
-  // TODO Uncomment this after finalizing the settings.
-  // context.subscriptions.push(
-  //   vscode.workspace.onDidChangeConfiguration(config => {
-  //     if (config.affectsConfiguration('cppcheck')) {
-  //       limits = read_limits();
-  //       vscode.workspace.textDocuments.forEach(lizard_document);
-  //     }
-  //  }));
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(config => {
+      if (config.affectsConfiguration('cppcheck')) {
+        check_whole_project();
+      }
+    }));
 }
 
 // function read_limits(): Configuration {

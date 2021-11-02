@@ -26,6 +26,10 @@ import { MessageChannel } from 'worker_threads';
 //   }
 // }
 
+export async function lint_whole_project(log_channel: vscode.OutputChannel) {
+  return create_diagnostics_for_all_output(await run_cppcheck(undefined, log_channel));
+}
+
 export async function lint_active_document(
   working_directory: string,
   log_channel: vscode.OutputChannel) {
@@ -34,40 +38,29 @@ export async function lint_active_document(
   }
   return await lint_document(
     vscode.window.activeTextEditor.document,
-    working_directory,
     log_channel);
-  // return {
-  //   document: vscode.window.activeTextEditor.document,
-  //   diagnostics: await lint_document(
-  //     vscode.window.activeTextEditor.document,
-  //     working_directory,
-  //     log_channel)
-  // };
 }
 
 export async function lint_document(
   file: vscode.TextDocument,
-  working_directory: string,
   log_channel: vscode.OutputChannel) {
   if (!['c', 'cpp'].includes(file.languageId) || file.uri.scheme !== 'file') {
     return [];
   }
-  let diags = create_diagnostics_for_all_output(
-    await run_cppcheck(file.uri.fsPath, working_directory, log_channel),
-    file);
-  return diags;
+  return create_diagnostics_for_all_output(await run_cppcheck(file.uri.fsPath, log_channel));
 }
 
 function run_cppcheck(
-  file_path: string,
-  working_directory: string,
+  file_path: string | undefined,
   log_channel: vscode.OutputChannel): Promise<string> {
   return new Promise((resolve, reject) => {
     const command_arguments = make_cppcheck_command(file_path);
     const cppcheck = "cppcheck";
     log_channel.appendLine(`> ${cppcheck} ${command_arguments.join(' ')}`);
-    log_channel.show();
 
+    const working_directory: string = vscode.workspace.workspaceFolders === undefined
+      ? ""
+      : vscode.workspace.workspaceFolders[0].uri.fsPath;
     const process = spawn(cppcheck, command_arguments, { "cwd": working_directory });
     if (process.pid) {
       let stdout = "";
@@ -122,7 +115,7 @@ function make_cppcheck_command(file: string | undefined) {
   return command_arguments;
 }
 
-function create_diagnostics_for_all_output(process_output: string, file: vscode.TextDocument) {
+function create_diagnostics_for_all_output(process_output: string) {
   const lines = process_output.trim().split('\n');
   let diagnostics = [];
   // let diagnostics = new ReadOnlyArray<
@@ -131,7 +124,7 @@ function create_diagnostics_for_all_output(process_output: string, file: vscode.
       vscode.window.showWarningMessage(line.replace(/.*-:-/, ""));
     } else {
       const elevation: string = vscode.workspace.getConfiguration("cppcheck").get("elevateSeverity") as string;
-      diagnostics.push(create_diagnostic_for_one_line(line, file, elevation));
+      diagnostics.push(create_diagnostic_for_one_line(line, elevation));
     }
   }
   return diagnostics;
@@ -165,7 +158,7 @@ function extract_function_name(cppcheck_message: string): string {
   return "";
 }
 
-function create_diagnostic_for_one_line(line: string, file: vscode.TextDocument, elevation: string): [vscode.Uri, vscode.Diagnostic[]] {
+function create_diagnostic_for_one_line(line: string, elevation: string): [vscode.Uri, vscode.Diagnostic[]] {
   // let diagnostics: vscode.Diagnostic[] = [];
   const details = line.split("-:-");
   const function_name = extract_function_name(details[5]);
