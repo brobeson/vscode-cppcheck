@@ -1,0 +1,33 @@
+# Copyright 2023 brobeson
+
+name: Static Analysis
+on:
+  pull_request:
+  push:
+
+# From https://stackoverflow.com/a/72408109
+# Create a group from the PR number, or the branch/tag name (if not a PR).
+# Cancel in-progress runs if the PR, branch, or tag is updated.
+concurrency:
+  group:
+    ${{github.workflow}}-${{github.event.pull_request.number || github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  CodeQuality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nosborn/github-action-markdown-cli@v3
+        with:
+          files: .
+          dot: true
+      - uses: creyD/prettier_action@v4.3
+        with:
+          dry: true
+          prettier_options: >
+            --check ./**/*.{md,json,yaml,yml} ./.prettierrc
+      - uses: streetsidesoftware/cspell-action@v2
+        with:
+          check_dot_files: true,
+          root: .
