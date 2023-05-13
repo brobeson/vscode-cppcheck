@@ -1,3 +1,8 @@
 {
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "search.exclude": {
+    "out": true // set this to false to include "out" folder in search results
+  },
+  "typescript.tsc.autoDetect": "off"
 }
