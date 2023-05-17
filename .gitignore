@@ -1,4 +1,4 @@
 .vscode-test/
+docs/_site/
 node_modules/
 out/
-docs/_site/

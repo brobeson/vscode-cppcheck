@@ -5,6 +5,8 @@ This is an extension for Visual Studio Code to run
 
 [![Build & Test](https://github.com/brobeson/vscode-cppcheck/actions/workflows/build.yaml/badge.svg)](https://github.com/brobeson/vscode-cppcheck/actions/workflows/build.yaml)
 
+[User Manual](https://brobeson.github.io/vscode-cppcheck/)
+
 ## Features
 
 ## Requirements
