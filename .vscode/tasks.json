@@ -5,6 +5,17 @@
   "tasks": [
     {
       "type": "npm",
+      "label": "VC: Format All The Things",
+      "detail": "Run Prettier on all files.",
+      "icon": { "id": "tools", "color": "terminal.ansiBlue" },
+      "script": "format",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "type": "npm",
       "script": "watch",
       "problemMatcher": "$tsc-watch",
       "isBackground": true,

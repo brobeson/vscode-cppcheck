@@ -26,7 +26,7 @@ jobs:
         with:
           dry: true
           prettier_options: >
-            --check ./**/*.{md,json,yaml,yml} ./.prettierrc
+            --check ./**/*.{md,json,ts,yaml,yml}
       - uses: streetsidesoftware/cspell-action@v2
         with:
           check_dot_files: true,
