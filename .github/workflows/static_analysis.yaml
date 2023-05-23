@@ -22,6 +22,7 @@ jobs:
         with:
           files: .
           dot: true
+          ignore_files: node_modules
       - uses: creyD/prettier_action@v4.3
         with:
           dry: true
@@ -31,3 +32,7 @@ jobs:
         with:
           check_dot_files: true,
           root: .
+      # Different ESLint actions in the marketplace kept throwing errors, so
+      # just run it from the package.json script.
+      - run: npm ci
+      - run: npm run lint

@@ -48,19 +48,111 @@
     "format": "prettier --write ./"
   },
   "devDependencies": {
-    "@types/vscode": "^1.78.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
-    "@typescript-eslint/eslint-plugin": "^5.59.1",
-    "@typescript-eslint/parser": "^5.59.1",
-    "eslint": "^8.39.0",
+    "@types/vscode": "^1.78.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.5",
+    "@typescript-eslint/parser": "^5.59.5",
+    "@vscode/test-electron": "^2.3.0",
+    "eslint": "^8.40.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
-    "typescript": "^5.0.4",
-    "@vscode/test-electron": "^2.3.0"
+    "typescript": "^5.0.4"
   },
   "prettier": {
     "proseWrap": "always"
+  },
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "project": [
+        "tsconfig.json"
+      ],
+      "sourceType": "module"
+    },
+    "extends": [
+      "eslint:all",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:@typescript-eslint/strict"
+    ],
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "env": {
+      "es6": true,
+      "mocha": true,
+      "node": true
+    },
+    "rules": {
+      "array-element-newline": [
+        "error",
+        "consistent"
+      ],
+      "capitalized-comments": [
+        "error",
+        "always",
+        {
+          "ignoreConsecutiveComments": true
+        }
+      ],
+      "comma-dangle": [
+        "error",
+        "always-multiline"
+      ],
+      "func-style": [
+        "error",
+        "declaration"
+      ],
+      "function-call-argument-newline": "off",
+      "function-paren-newline": "off",
+      "id-length": "off",
+      "indent": "off",
+      "max-len": [
+        "error",
+        {
+          "code": 200,
+          "comments": 80
+        }
+      ],
+      "multiline-comment-style": "off",
+      "no-console": "off",
+      "no-multi-spaces": [
+        "error",
+        {
+          "ignoreEOLComments": true
+        }
+      ],
+      "no-warning-comments": "off",
+      "object-curly-spacing": "off",
+      "object-property-newline": [
+        "error",
+        {
+          "allowAllPropertiesOnSameLine": true
+        }
+      ],
+      "one-var": "off",
+      "padded-blocks": [
+        "error",
+        "never"
+      ],
+      "quote-props": [
+        "error",
+        "as-needed"
+      ],
+      "quotes": "off",
+      "sort-imports": "off",
+      "sort-keys": [
+        "error",
+        "asc",
+        {
+          "natural": true
+        }
+      ],
+      "space-before-function-paren": "off"
+    }
   }
 }

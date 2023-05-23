@@ -1,17 +1,19 @@
-import * as path from "path";
-import * as Mocha from "mocha";
 import * as glob from "glob";
+import * as Mocha from "mocha";
+import * as path from "path";
 
 export function run(): Promise<void> {
   // Create the mocha test
   const mocha = new Mocha({
-    ui: "tdd",
     color: true,
+    ui: "tdd",
   });
 
   const testsRoot = path.resolve(__dirname, "..");
 
   return new Promise((c, e) => {
+    // TODO Fix the consistent return issue.
+    // eslint-disable-next-line consistent-return
     glob("**/**.test.js", { cwd: testsRoot }, (err, files) => {
       if (err) {
         return e(err);
@@ -29,9 +31,9 @@ export function run(): Promise<void> {
             c();
           }
         });
-      } catch (err) {
-        console.error(err);
-        e(err);
+      } catch (error) {
+        console.error(error);
+        e(error);
       }
     });
   });

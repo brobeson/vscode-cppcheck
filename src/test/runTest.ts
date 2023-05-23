@@ -1,6 +1,5 @@
-import * as path from "path";
-
 import { runTests } from "@vscode/test-electron";
+import * as path from "path";
 
 async function main() {
   try {
@@ -20,4 +19,5 @@ async function main() {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();

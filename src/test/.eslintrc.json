@@ -1,0 +1,6 @@
+{
+  // I don't care if tests use magic numbers.
+  "rules": {
+    "no-magic-numbers": "off"
+  }
+}

@@ -4,15 +4,23 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "npm",
       "label": "VC: Format All The Things",
       "detail": "Run Prettier on all files.",
       "icon": { "id": "tools", "color": "terminal.ansiBlue" },
+      "type": "npm",
       "script": "format",
       "problemMatcher": [],
       "presentation": {
         "reveal": "never"
       }
+    },
+    {
+      "label": "VC: Lint All the Things",
+      "detail": "Run ESLint on the project.",
+      "icon": { "id": "tools", "color": "terminal.ansiBlue" },
+      "type": "npm",
+      "script": "lint",
+      "problemMatcher": "$eslint-stylish"
     },
     {
       "type": "npm",
