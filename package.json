@@ -7,7 +7,7 @@
   "engines": {
     "vscode": "^1.78.0"
   },
-  "license": "SEE LICENSE IN license.md.",
+  "license": "MIT",
   "categories": [
     "Linters"
   ],
@@ -31,12 +31,46 @@
   "homepage": "https://github.com/brobeson/vscode-cppcheck/blob/main/README.md",
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "vscode-cppcheck.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+    // "commands": [
+    //   {
+    //     "command": "cppcheck.scanProject",
+    //     "title": "Scan the Whole Project",
+    //     "category": "Cppcheck"
+    //   }
+    // ],
+    // "configuration": {
+    //   "title": "cppcheck",
+    //   "properties": {
+    //     "cppcheck.elevateSeverity": {
+    //       "type": "string",
+    //       "description": "Elevate all Cppcheck messages to the specified level. Messages above this level are left alone.",
+    //       "enum": [
+    //         "error",
+    //         "no elevation",
+    //         "warning"
+    //       ],
+    //       "enumDescriptions": [
+    //         "Treat Cppcheck warning, style, performance, and portability messages as errors",
+    //         "Treat Cppcheck style, performance, and portability messages as information.",
+    //         "Treat Cppcheck style, performance, and portability messages as warnings"
+    //       ],
+    //       "default": "no elevation"
+    //     },
+    //     "cppcheck.commandArguments": {
+    //       "type": "array",
+    //       "markdownDescription": "Command line arguments to pass to Cppcheck. **WARNING** This extension removes some arguments from the list. For example, `--template` is removed because the extension requires a specific template to parse the output.",
+    //       "default": [
+    //         "--enable=all",
+    //         "--quiet",
+    //         "--project=../build/compile_commands.json"
+    //       ],
+    //       "additionalProperties": false,
+    //       "items": {
+    //         "type": "string"
+    //       }
+    //     }
+    //   }
+    // }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -103,6 +137,10 @@
         "error",
         "always-multiline"
       ],
+      "dot-location": [
+        "error",
+        "property"
+      ],
       "func-style": [
         "error",
         "declaration"
@@ -118,14 +156,29 @@
           "comments": 80
         }
       ],
+      "max-params": [
+        "error",
+        5
+      ],
+      "max-statements": [
+        "error",
+        15
+      ],
       "multiline-comment-style": "off",
       "no-console": "off",
+      "no-magic-numbers": [
+        "error",
+        {
+          "ignoreArrayIndexes": true
+        }
+      ],
       "no-multi-spaces": [
         "error",
         {
           "ignoreEOLComments": true
         }
       ],
+      "no-ternary": "off",
       "no-warning-comments": "off",
       "object-curly-spacing": "off",
       "object-property-newline": [
@@ -144,6 +197,7 @@
         "as-needed"
       ],
       "quotes": "off",
+      "radix": "off",
       "sort-imports": "off",
       "sort-keys": [
         "error",
