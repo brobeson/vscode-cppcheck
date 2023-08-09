@@ -11,6 +11,9 @@ This is an extension for Visual Studio Code to run
 
 ## Requirements
 
+> [!WARNING]  
+> Some warning text
+
 You must already have Cppcheck installed, and available in your `PATH`.
 
 ## Extension Settings
