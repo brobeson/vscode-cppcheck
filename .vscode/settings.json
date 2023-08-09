@@ -2,7 +2,11 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "search.exclude": {
-    "out": true
+    "**/node_modules": true,
+    "**/out": true
   },
-  "typescript.tsc.autoDetect": "off"
+  "typescript.tsc.autoDetect": "off",
+  "[typescript][markdown][json][yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

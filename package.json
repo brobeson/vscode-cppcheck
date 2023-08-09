@@ -31,46 +31,46 @@
   "homepage": "https://github.com/brobeson/vscode-cppcheck/blob/main/README.md",
   "main": "./out/extension.js",
   "contributes": {
-    // "commands": [
-    //   {
-    //     "command": "cppcheck.scanProject",
-    //     "title": "Scan the Whole Project",
-    //     "category": "Cppcheck"
-    //   }
-    // ],
-    // "configuration": {
-    //   "title": "cppcheck",
-    //   "properties": {
-    //     "cppcheck.elevateSeverity": {
-    //       "type": "string",
-    //       "description": "Elevate all Cppcheck messages to the specified level. Messages above this level are left alone.",
-    //       "enum": [
-    //         "error",
-    //         "no elevation",
-    //         "warning"
-    //       ],
-    //       "enumDescriptions": [
-    //         "Treat Cppcheck warning, style, performance, and portability messages as errors",
-    //         "Treat Cppcheck style, performance, and portability messages as information.",
-    //         "Treat Cppcheck style, performance, and portability messages as warnings"
-    //       ],
-    //       "default": "no elevation"
-    //     },
-    //     "cppcheck.commandArguments": {
-    //       "type": "array",
-    //       "markdownDescription": "Command line arguments to pass to Cppcheck. **WARNING** This extension removes some arguments from the list. For example, `--template` is removed because the extension requires a specific template to parse the output.",
-    //       "default": [
-    //         "--enable=all",
-    //         "--quiet",
-    //         "--project=../build/compile_commands.json"
-    //       ],
-    //       "additionalProperties": false,
-    //       "items": {
-    //         "type": "string"
-    //       }
-    //     }
-    //   }
-    // }
+    "commands": [
+      {
+        "command": "cppcheck.scanProject",
+        "title": "Scan the Whole Project",
+        "category": "Cppcheck"
+      }
+    ],
+    "configuration": {
+      "title": "cppcheck",
+      "properties": {
+        "cppcheck.elevateSeverity": {
+          "type": "string",
+          "description": "Elevate all Cppcheck messages to the specified level. Messages above this level are left alone.",
+          "enum": [
+            "error",
+            "no elevation",
+            "warning"
+          ],
+          "enumDescriptions": [
+            "Treat Cppcheck warning, style, performance, and portability messages as errors",
+            "Treat Cppcheck style, performance, and portability messages as information.",
+            "Treat Cppcheck style, performance, and portability messages as warnings"
+          ],
+          "default": "no elevation"
+        },
+        "cppcheck.commandArguments": {
+          "type": "array",
+          "markdownDescription": "Command line arguments to pass to Cppcheck. **WARNING** This extension removes some arguments from the list. For example, `--template` is removed because the extension requires a specific template to parse the output.",
+          "default": [
+            "--enable=all",
+            "--quiet",
+            "--project=../build/compile_commands.json"
+          ],
+          "additionalProperties": false,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -79,6 +79,7 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
+    "unitTests": "mocha ./out/tests/",
     "format": "prettier --write ./"
   },
   "devDependencies": {
