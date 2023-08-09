@@ -1,0 +1,21 @@
+default: true
+header-style:
+  style: atx
+ul-style:
+  style: dash
+line-length:
+  tables: false
+no-duplicate-heading:
+  siblings_only: true
+ol-prefix:
+  style: one
+blanks-around-fences:
+  list_items: false
+code-block-style:
+  style: fenced
+code-fence-style:
+  style: backtick
+emphasis-style:
+  style: underscore
+strong-style:
+  style: asterisk

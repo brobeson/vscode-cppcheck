@@ -1,0 +1,26 @@
+# Copyright 2023 brobeson
+
+name: Build & Test
+on:
+  pull_request:
+  push:
+
+# From https://stackoverflow.com/a/72408109
+# Create a group from the PR number, or the branch/tag name (if not a PR).
+# Cancel in-progress runs if the PR, branch, or tag is updated.
+concurrency:
+  group:
+    ${{github.workflow}}-${{github.event.pull_request.number || github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - name: Build the extension
+        run: npm run compile
+      - name: Run the unit tests
+        run: npm run unitTests

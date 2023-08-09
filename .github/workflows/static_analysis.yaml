@@ -14,25 +14,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  CodeQuality:
+  staticAnalysis:
+    name: Code Quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: nosborn/github-action-markdown-cli@v3
+      - name: Check for Markdown lint
+        uses: nosborn/github-action-markdown-cli@v3
         with:
           files: .
           dot: true
           ignore_files: node_modules
-      - uses: creyD/prettier_action@v4.3
+      - name: Check formatting
+        uses: creyD/prettier_action@v4.3
         with:
           dry: true
           prettier_options: >
             --check ./**/*.{md,json,ts,yaml,yml}
-      - uses: streetsidesoftware/cspell-action@v2
+      - name: Check spelling
+        uses: streetsidesoftware/cspell-action@v2
         with:
           check_dot_files: true,
           root: .
       # Different ESLint actions in the marketplace kept throwing errors, so
       # just run it from the package.json script.
       - run: npm ci
-      - run: npm run lint
+      - name: Check for TypeScript lint
+        run: npm run lint

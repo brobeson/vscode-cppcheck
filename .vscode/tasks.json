@@ -4,23 +4,45 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "VC: Format All The Things",
+      "label": "VC: Format",
       "detail": "Run Prettier on all files.",
       "icon": { "id": "tools", "color": "terminal.ansiBlue" },
       "type": "npm",
       "script": "format",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "never"
-      }
+      "problemMatcher": []
     },
     {
-      "label": "VC: Lint All the Things",
+      "label": "VC: Lint",
       "detail": "Run ESLint on the project.",
       "icon": { "id": "tools", "color": "terminal.ansiBlue" },
       "type": "npm",
       "script": "lint",
       "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "VC: Compile",
+      "detail": "Build the extension and tests.",
+      "icon": { "id": "tools", "color": "terminal.ansiBlue" },
+      "type": "npm",
+      "script": "compile",
+      "problemMatcher": "$tsc",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "VC: Test",
+      "detail": "Build the code and run the unit tests.",
+      "icon": { "id": "beaker", "color": "terminal.ansiBlue" },
+      "type": "npm",
+      "script": "unitTests",
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "dependsOn": ["VS: Compile"]
     },
     {
       "type": "npm",
@@ -32,7 +54,7 @@
       },
       "group": {
         "kind": "build",
-        "isDefault": true
+        "isDefault": false
       }
     }
   ]
