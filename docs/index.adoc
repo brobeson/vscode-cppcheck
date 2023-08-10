@@ -1,0 +1,5 @@
+= VS Code Cppcheck
+
+image:https://img.shields.io/visual-studio-marketplace/v/brobeson.ctest-lab[Visual Studio Marketplace Version (including pre-releases)]
+
+WARNING: This extension is still a preview lacking some major functionality.
