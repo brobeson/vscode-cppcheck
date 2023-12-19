@@ -2,6 +2,7 @@
 
 name: Build & Test
 on:
+  workflow_dispatch:
   pull_request:
   push:
 
@@ -12,14 +13,21 @@ concurrency:
   group:
     ${{github.workflow}}-${{github.event.pull_request.number || github.ref}}
   cancel-in-progress: true
-
 jobs:
+  staticAnalysis:
+    name: Support File Quality
+    uses: brobeson/brobeson/.github/workflows/support_files.yaml@main
+  # build:
+  #   name: Build & Test
+  #   uses: brobeson/brobeson/.github/workflows/typescript.yaml@reusable_workflows
   build:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: npm ci
+      - name: Check for TypeScript Lint
+        run: npm run lint
       - name: Build the extension
         run: npm run compile
       - name: Run the unit tests

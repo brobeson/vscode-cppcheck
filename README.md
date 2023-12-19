@@ -4,7 +4,6 @@ This is an extension for Visual Studio Code to run
 [Cppcheck](https://github.com/danmar/cppcheck) on your project.
 
 [![Build & Test](https://github.com/brobeson/vscode-cppcheck/actions/workflows/build.yaml/badge.svg)](https://github.com/brobeson/vscode-cppcheck/actions/workflows/build.yaml)
-[![Static Analysis](https://github.com/brobeson/vscode-cppcheck/actions/workflows/static_analysis.yaml/badge.svg)](https://github.com/brobeson/vscode-cppcheck/actions/workflows/static_analysis.yaml)
 
 ## Features
 

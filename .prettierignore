@@ -1,0 +1,23 @@
+# Adapted from https://stackoverflow.com/a/70715829
+# We turn prettier ignore into prettier include. Start by ignoring everything,
+# then add back the files we want Prettier to format, then tell Prettier to
+# search subdirectories.
+
+# Ignore everything
+*
+
+# Include files by extension
+!*.json
+!*.md
+!*.yaml
+!*.yml
+
+# Include files that don't use file extensions
+
+# Check subdirectories
+!*/
+
+# Except a build/ subdirectory
+.vscode-test/
+node_modules/
+out/
