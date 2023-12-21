@@ -83,6 +83,7 @@
     "format": "prettier --write ./"
   },
   "devDependencies": {
+    "@tsconfig/strictest": "^2.0.1",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
@@ -100,6 +101,9 @@
   },
   "eslintConfig": {
     "root": true,
+    "ignorePatterns": [
+      "**/test/**/*.ts"
+    ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "ecmaVersion": 6,
