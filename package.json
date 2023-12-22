@@ -131,13 +131,7 @@
         "error",
         "consistent"
       ],
-      "capitalized-comments": [
-        "error",
-        "always",
-        {
-          "ignoreConsecutiveComments": true
-        }
-      ],
+      "capitalized-comments": "off",
       "comma-dangle": [
         "error",
         "always-multiline"
@@ -174,6 +168,9 @@
       "no-magic-numbers": [
         "error",
         {
+          "ignore": [
+            0
+          ],
           "ignoreArrayIndexes": true
         }
       ],

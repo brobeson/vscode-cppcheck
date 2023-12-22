@@ -1,5 +1,17 @@
 import * as vscode from "vscode";
-// Import { lint_whole_project } from './cppcheck';
+import * as cppcheck from "./cppcheck";
+
+function checkFile(fileName: string, logChannel: vscode.OutputChannel) {
+  const command = cppcheck.makeCppcheckCommand(fileName);
+  cppcheck.runCppcheck(command, logChannel).then(
+    () => {
+      logChannel.appendLine("Done");
+    },
+    () => {
+      logChannel.appendLine("Failed");
+    }
+  );
+}
 
 export function activate(context: vscode.ExtensionContext) {
   const { subscriptions } = context;
@@ -16,6 +28,10 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Context.subscriptions.push(
   // vscode.commands.registerCommand('cppcheck.scanProject', checkWholeProject))
+  context.subscriptions.push(
+    vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+      checkFile(document.fileName, logChannel);
+    }));
   // context.subscriptions.push(
   //   vscode.workspace.onDidSaveTextDocument(checkWholeProject));
   // context.subscriptions.push(

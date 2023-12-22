@@ -1,7 +1,8 @@
 /* eslint-disable capitalized-comments,max-len */
-// import { spawn } from 'child_process';
+import { spawn } from "child_process";
+import * as vscode from "vscode";
+
 // import { readFileSync } from 'fs';
-// import * as vscode from 'vscode';
 
 /*
 export async function lint_whole_project(log_channel: vscode.OutputChannel) {
@@ -26,42 +27,45 @@ export async function lint_document(
   }
   return create_diagnostics_for_all_output(await run_cppcheck(file.uri.fsPath, log_channel));
 }
+*/
 
-function run_cppcheck(
-  file_path: string | undefined,
-  log_channel: vscode.OutputChannel): Promise<string> {
+export function runCppcheck(
+  command: string[],
+  logChannel: vscode.OutputChannel
+): Promise<string> {
   return new Promise((resolve, reject) => {
-    const command_arguments = make_cppcheck_command(file_path);
-    const cppcheck = "cppcheck";
-    log_channel.appendLine(`> ${cppcheck} ${command_arguments.join(' ')}`);
-
-    const working_directory: string = vscode.workspace.workspaceFolders === undefined
-      ? ""
-      : vscode.workspace.workspaceFolders[0].uri.fsPath;
-    const process = spawn(cppcheck, command_arguments, { "cwd": working_directory });
+    logChannel.appendLine("Running: ".concat(command.join(" ")));
+    const workingDirectory: string =
+      typeof vscode.workspace.workspaceFolders === "undefined" || typeof vscode.workspace.workspaceFolders[0] === "undefined"
+        ? ""
+        : vscode.workspace.workspaceFolders[0].uri.fsPath;
+    // eslint-disable-next-line no-magic-numbers
+    const cppcheckArguments = command.slice(1);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const process = spawn(command.at(0)!, cppcheckArguments, {
+      cwd: workingDirectory,
+    });
     if (process.pid) {
       let stderr = "";
-      process.stdout.on("data", data => {
-        log_channel.appendLine(data);
+      process.stdout.on("data", (data) => {
+        logChannel.appendLine(data as string);
       });
-      process.stderr.on("data", data => {
-        log_channel.appendLine(data);
+      process.stderr.on("data", (data) => {
+        logChannel.appendLine(data as string);
         stderr += data;
       });
       process.stderr.on("end", () => {
         resolve(stderr);
       });
-      process.on("error", err => {
-        log_channel.appendLine(err.message);
+      process.on("error", (err) => {
+        logChannel.appendLine(err.message);
         reject(err);
       });
-    }
-    else {
-      log_channel.appendLine("Failed to run Cppcheck.");
+    } else {
+      logChannel.appendLine("Error: Failed to run Cppcheck.");
     }
   });
 }
-*/
 
 /**
  * Get the Cppcheck command.
@@ -69,7 +73,7 @@ function run_cppcheck(
  * @returns An array of strings. The 0th element is the Cppcheck command. The
  * remaining elements are the command arguments.
  */
-export function makeCppcheckCommand(file?: string) {
+export function makeCppcheckCommand(file?: string): string[] {
   const commandArguments = ["cppcheck", "--enable=all"];
   // const configuration = vscode.workspace.getConfiguration("cppcheck");
   // if (configuration.has("commandArguments")) {
