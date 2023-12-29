@@ -31,15 +31,15 @@ export async function lint_document(
 
 export function runCppcheck(
   command: string[],
-  logChannel: vscode.OutputChannel
+  logChannel: vscode.OutputChannel,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     logChannel.appendLine("Running: ".concat(command.join(" ")));
     const workingDirectory: string =
-      typeof vscode.workspace.workspaceFolders === "undefined" || typeof vscode.workspace.workspaceFolders[0] === "undefined"
+      typeof vscode.workspace.workspaceFolders === "undefined"
+        || typeof vscode.workspace.workspaceFolders[0] === "undefined"
         ? ""
         : vscode.workspace.workspaceFolders[0].uri.fsPath;
-    // eslint-disable-next-line no-magic-numbers
     const cppcheckArguments = command.slice(1);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const process = spawn(command.at(0)!, cppcheckArguments, {
@@ -55,7 +55,11 @@ export function runCppcheck(
         stderr += data;
       });
       process.stderr.on("end", () => {
-        resolve(stderr);
+        // Chop off the trailing \n and , from the raw Cppcheck output, then
+        // wrap it all in [] to return a valid JSON array string.
+        // eslint-disable-next-line no-magic-numbers
+        const substringLength = stderr.length - 2;
+        resolve(`[${stderr.substring(0, substringLength)}]`);
       });
       process.on("error", (err) => {
         logChannel.appendLine(err.message);
@@ -73,8 +77,12 @@ export function runCppcheck(
  * @returns An array of strings. The 0th element is the Cppcheck command. The
  * remaining elements are the command arguments.
  */
-export function makeCppcheckCommand(file?: string): string[] {
-  const commandArguments = ["cppcheck", "--enable=all"];
+export function makeCppcheckCommand(file?: string) {
+  const commandArguments = [
+    "cppcheck",
+    "--enable=all",
+    '--template={"file":"{file}","line":{line},"column":{column},"severity":"{severity}","message":"{message}","id":"{id}"},',
+  ];
   // const configuration = vscode.workspace.getConfiguration("cppcheck");
   // if (configuration.has("commandArguments")) {
   //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -88,21 +96,67 @@ export function makeCppcheckCommand(file?: string): string[] {
   return commandArguments;
 }
 
-/*
-function create_diagnostics_for_all_output(process_output: string) {
-  const lines = process_output.trim().split('\n');
-  let diagnostics = [];
-  for (const line of lines) {
-    if (line.startsWith("nofile")) {
-      vscode.window.showWarningMessage(line.replace(/.*-:-/, ""));
-    } else {
-      const elevation: string = vscode.workspace.getConfiguration("cppcheck").get("elevateSeverity") as string;
-      diagnostics.push(create_diagnostic_for_one_line(line, elevation));
-    }
+const severityMap = new Map<string, vscode.DiagnosticSeverity>([
+  ["debug", vscode.DiagnosticSeverity.Information],
+  ["error", vscode.DiagnosticSeverity.Error],
+  ["information", vscode.DiagnosticSeverity.Information],
+  ["none", vscode.DiagnosticSeverity.Hint],
+  ["performance", vscode.DiagnosticSeverity.Information],
+  ["portability", vscode.DiagnosticSeverity.Information],
+  ["style", vscode.DiagnosticSeverity.Information],
+  ["warning", vscode.DiagnosticSeverity.Warning],
+]);
+
+interface Issue {
+  file: string;
+  line: number;
+  column: number;
+  severity: "debug" | "error" | "information" | "none" | "performance" | "portability" | "style" | "warning";
+  message: string;
+  id: string;
+}
+
+function createFileDiagnostic(issue: Issue) {
+  const d = new vscode.Diagnostic(
+    new vscode.Range(
+      issue.line - 1,
+      issue.column,
+      issue.line - 1,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    issue.message,
+    severityMap.get(issue.severity),
+  );
+  d.code = issue.id;
+  d.source = "Cppcheck";
+  return d;
+}
+
+function createNoFileDiagnostic(issue: Issue) {
+  const d = new vscode.Diagnostic(
+    new vscode.Range(0, 0, 0, 0),
+    issue.message,
+    vscode.DiagnosticSeverity.Information,
+  );
+  d.code = issue.id;
+  d.source = "cppcheck";
+  return d;
+}
+
+function createDiagnostic(issue: Issue) {
+  if (issue.file === "nofile") {
+    return createNoFileDiagnostic(issue);
   }
+  return createFileDiagnostic(issue);
+}
+
+export function parseIssues(cppcheckJsonOutput: string) {
+  const issues = JSON.parse(cppcheckJsonOutput) as Issue[];
+  const diagnostics = issues.map(createDiagnostic);
   return diagnostics;
 }
 
+/*
 function extract_function_name(cppcheck_message: string): string {
   if (cppcheck_message.startsWith("The function '")) {
     const index = cppcheck_message.indexOf("'", 14);
@@ -123,14 +177,14 @@ function create_diagnostic_for_one_line(line: string, elevation: string): [vscod
   let diagnostic = new vscode.Diagnostic(
     get_function_range(line_index, column_index, function_name, code_line),
     details[5],
-    cppcheck_severity_to_vscode_severity(details[3], elevation)
+    to_vscode_severity(details[3], elevation)
   );
   diagnostic.code = `${details[4]}`;
   diagnostic.source = "Cppcheck";
   return [vscode.Uri.file(details[0]), [diagnostic]];
 }
 
-function cppcheck_severity_to_vscode_severity(cppcheck_severity: string, elevation: string): vscode.DiagnosticSeverity {
+function to_vscode_severity(cppcheck_severity: string, elevation: string): vscode.DiagnosticSeverity {
   if (cppcheck_severity === "error" || elevation === "error") {
     return vscode.DiagnosticSeverity.Error;
   }

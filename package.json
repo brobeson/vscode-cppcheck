@@ -3,7 +3,7 @@
   "publisher": "brobeson",
   "displayName": "Cppcheck",
   "description": "Run Cppcheck on your C and C++ code.",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "engines": {
     "vscode": "^1.78.0"
   },
@@ -106,7 +106,7 @@
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-      "ecmaVersion": 6,
+      "ecmaVersion": 2022,
       "project": [
         "tsconfig.json"
       ],
@@ -127,6 +127,7 @@
       "node": true
     },
     "rules": {
+      "@typescript-eslint/no-shadow": "error",
       "array-element-newline": [
         "error",
         "consistent"
@@ -136,10 +137,12 @@
         "error",
         "always-multiline"
       ],
+      "curly": "error",
       "dot-location": [
         "error",
         "property"
       ],
+      "eqeqeq": "error",
       "func-style": [
         "error",
         "declaration"
@@ -169,7 +172,8 @@
         "error",
         {
           "ignore": [
-            0
+            0,
+            1
           ],
           "ignoreArrayIndexes": true
         }
@@ -180,6 +184,7 @@
           "ignoreEOLComments": true
         }
       ],
+      "no-shadow": "off",
       "no-ternary": "off",
       "no-warning-comments": "off",
       "object-curly-spacing": "off",
@@ -190,6 +195,15 @@
         }
       ],
       "one-var": "off",
+      "operator-linebreak": [
+        "error",
+        "before",
+        {
+          "overrides": {
+            "=": "after"
+          }
+        }
+      ],
       "padded-blocks": [
         "error",
         "never"

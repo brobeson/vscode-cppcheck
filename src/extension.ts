@@ -1,15 +1,18 @@
 import * as vscode from "vscode";
 import * as cppcheck from "./cppcheck";
 
-function checkFile(fileName: string, logChannel: vscode.OutputChannel) {
-  const command = cppcheck.makeCppcheckCommand(fileName);
+function checkFile(fileUri: vscode.Uri,
+  logChannel: vscode.OutputChannel,
+  diagnostics: vscode.DiagnosticCollection) {
+  const command = cppcheck.makeCppcheckCommand(fileUri.fsPath);
   cppcheck.runCppcheck(command, logChannel).then(
-    () => {
-      logChannel.appendLine("Done");
+    (data: string) => {
+      diagnostics.delete(fileUri);
+      diagnostics.set(fileUri, cppcheck.parseIssues(data));
     },
     () => {
       logChannel.appendLine("Failed");
-    }
+    },
   );
 }
 
@@ -20,17 +23,18 @@ export function activate(context: vscode.ExtensionContext) {
   const logChannel = vscode.window.createOutputChannel("Cppcheck");
   subscriptions.push(logChannel);
 
-  // Function checkWholeProject() {
+  // async function checkWholeProject() {
   //   diagnostics.clear();
-  //   // Const diagnosticList = await lintWholeProject(logChannel);
-  //   // Diagnostics.set(diagnosticList);
+  //   const diagnosticList = await lintWholeProject(logChannel);
+  //   diagnostics.set(diagnosticList);
   // }
 
-  // Context.subscriptions.push(
-  // vscode.commands.registerCommand('cppcheck.scanProject', checkWholeProject))
+  // context.subscriptions.push(
+  /* eslint-disable max-len */
+  //   vscode.commands.registerCommand('cppcheck.scanProject', checkWholeProject))
   context.subscriptions.push(
-    vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
-      checkFile(document.fileName, logChannel);
+    vscode.workspace.onDidSaveTextDocument((document) => {
+      checkFile(document.uri, logChannel, diagnostics);
     }));
   // context.subscriptions.push(
   //   vscode.workspace.onDidSaveTextDocument(checkWholeProject));
