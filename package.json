@@ -96,9 +96,6 @@
     "mocha": "^10.2.0",
     "typescript": "^5.0.4"
   },
-  "prettier": {
-    "proseWrap": "always"
-  },
   "eslintConfig": {
     "root": true,
     "ignorePatterns": [

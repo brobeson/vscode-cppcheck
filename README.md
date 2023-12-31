@@ -1,22 +1,20 @@
-# vscode-cppcheck
+# Cppcheck for VS Code
 
-This is an extension for Visual Studio Code to run
-[Cppcheck](https://github.com/danmar/cppcheck) on your project.
+This is an extension for Visual Studio Code to run [Cppcheck](https://github.com/danmar/cppcheck) on your project.
+
+<!-- ![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/brobeson.ctest-lab?label=Current%20Version) -->
 
 [![Build & Test](https://github.com/brobeson/vscode-cppcheck/actions/workflows/build.yaml/badge.svg)](https://github.com/brobeson/vscode-cppcheck/actions/workflows/build.yaml)
 
 ## Features
 
+- Runs Cppcheck when you save a C++ file.
+- Report issues as diagnostics in the Problems panel.
+
 ## Requirements
 
-You must already have Cppcheck installed, and available in your `PATH`.
-
-## Extension Settings
-
-You control vscode-cppcheck with these settings.
-
-## Commands
+You must [install Cppcheck](https://github.com/danmar/cppcheck#packages) and have it available in your `PATH`.
 
 ## Known Issues
 
-## Release Notes
+![GitHub issues by-label](https://img.shields.io/github/issues/brobeson/vscode-cppcheck/bug?logo=github)

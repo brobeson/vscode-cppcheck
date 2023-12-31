@@ -1,11 +1,8 @@
 # Change Log
 
-All notable changes to the "vscode-cppcheck" extension will be documented in
-this file.
+## Unreleased
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how
-to structure this file.
+### Added
 
-## [Unreleased]
-
-- Initial release
+- Automatically run Cppcheck when saving a C++ file
+- Display issues as diagnostics
