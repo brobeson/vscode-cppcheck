@@ -1,5 +1,14 @@
 # Change Log
 
+<!-- Allow identical headings; this file reuses level 3 headings like Added. -->
+<!-- markdownlint-disable MD024 -->
+
+## Unreleased
+
+### Added
+
+- Issue templates to report bugs and request new features (#1)
+
 ## [0.1.0](https://github.com/brobeson/vscode-cppcheck/releases/tag/v0.1.0) — 2023 December 30
 
 ### Added

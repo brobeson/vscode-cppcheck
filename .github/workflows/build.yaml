@@ -10,8 +10,7 @@ on:
 # Create a group from the PR number, or the branch/tag name (if not a PR).
 # Cancel in-progress runs if the PR, branch, or tag is updated.
 concurrency:
-  group:
-    ${{github.workflow}}-${{github.event.pull_request.number || github.ref}}
+  group: ${{github.workflow}}-${{github.event.pull_request.number || github.ref}}
   cancel-in-progress: true
 jobs:
   staticAnalysis:

@@ -1,0 +1,24 @@
+name: Bug Report
+description: Report a bug in the extension.
+labels: [bug]
+assignees: [brobeson]
+body:
+  - type: input
+    attributes:
+      label: Extension Version
+      description: Which version of the extension has the bug?
+      value: v0.1.0
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: Describe the current behavior of the extension.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: Describe the behavior you expect.
+    validations:
+      required: true

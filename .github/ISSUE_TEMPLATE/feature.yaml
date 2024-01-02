@@ -1,0 +1,18 @@
+name: New Feature
+description: Request a new feature in the extension.
+labels: [enhancement]
+assignees: [brobeson]
+body:
+  - type: input
+    attributes:
+      label: Extension Version
+      description: Which version of the extension are you using?
+      value: v0.1.0
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What's the feature?
+      description: Describe the new behavior. Include links to relevant documentation in other tools such as VS Code or Cppcheck.
+    validations:
+      required: true
