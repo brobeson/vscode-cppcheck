@@ -1,0 +1,14 @@
+# Copyright 2024 brobeson
+
+name: Issue Triage
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+jobs:
+  issueTriage:
+    name: Issue Triage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "Hello"
