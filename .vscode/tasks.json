@@ -1,20 +1,24 @@
-// See https://go.microsoft.com/fwlink/?LinkId=733558
-// for the documentation about the tasks.json format
 {
   "version": "2.0.0",
   "tasks": [
     {
       "label": "VC: Format",
       "detail": "Run Prettier on all files.",
-      "icon": { "id": "tools", "color": "terminal.ansiBlue" },
+      "icon": {
+        "id": "tools",
+        "color": "terminal.ansiBlue"
+      },
       "type": "npm",
       "script": "format",
       "problemMatcher": []
     },
     {
-      "label": "VC: Lint",
+      "label": "VC: ESLint",
       "detail": "Run ESLint on the project.",
-      "icon": { "id": "tools", "color": "terminal.ansiBlue" },
+      "icon": {
+        "id": "tools",
+        "color": "terminal.ansiBlue"
+      },
       "type": "npm",
       "script": "lint",
       "problemMatcher": "$eslint-stylish"
@@ -22,7 +26,10 @@
     {
       "label": "VC: Compile",
       "detail": "Build the extension and tests.",
-      "icon": { "id": "tools", "color": "terminal.ansiBlue" },
+      "icon": {
+        "id": "tools",
+        "color": "terminal.ansiBlue"
+      },
       "type": "npm",
       "script": "compile",
       "problemMatcher": "$tsc",
@@ -34,7 +41,10 @@
     {
       "label": "VC: Test",
       "detail": "Build the code and run the unit tests.",
-      "icon": { "id": "beaker", "color": "terminal.ansiBlue" },
+      "icon": {
+        "id": "beaker",
+        "color": "terminal.ansiBlue"
+      },
       "type": "npm",
       "script": "unitTests",
       "problemMatcher": [],
@@ -42,7 +52,7 @@
         "kind": "test",
         "isDefault": true
       },
-      "dependsOn": ["VS: Compile"]
+      "dependsOn": ["VC: Compile"]
     },
     {
       "type": "npm",
@@ -56,6 +66,45 @@
         "kind": "build",
         "isDefault": false
       }
+    },
+    {
+      "label": "VC: Markdown Lint",
+      "icon": {
+        "id": "tools",
+        "color": "terminal.ansiBlue"
+      },
+      "detail": "Run Markdown Lint.",
+      "type": "shell",
+      "command": "markdownlint",
+      "args": ["."],
+      "problemMatcher": {
+        "source": " ",
+        "owner": "markdown lint task",
+        "fileLocation": "relative",
+        "severity": "error",
+        "pattern": {
+          "regexp": "^([^:]+):(\\d+)\\s+([^\\s]+)\\s+(.+)$",
+          "file": 1,
+          "line": 2,
+          "message": 4,
+          "code": 3
+        }
+      }
+    },
+    {
+      "label": "VC: Pipeline",
+      "icon": {
+        "id": "tools",
+        "color": "terminal.ansiMagenta"
+      },
+      "detail": "Run CI/CT tasks imitating the GH workflow.",
+      "dependsOn": [
+        "VC: Format",
+        "VC: Markdown Lint",
+        "VC: ESLint",
+        "VC: Test" // Relies on VC: Compile
+      ],
+      "problemMatcher": []
     }
   ]
 }

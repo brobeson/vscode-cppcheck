@@ -21,3 +21,9 @@ This table lists the NPM scripts and the corresponding Code tasks.
 | format      | `VC: Format`  | Run [Prettier](https://prettier.io) to format the TypeScript, Markdown, YAML, and JSON files. |
 | lint        | `VS: Lint`    | Run [ESLint](https://eslint.org/) on the the Typescript files. |
 | unitTests   | `VC: Test`    | Run the unit tests. The VS Code task will automatically run the `VC: Compile` task, first. |
+
+> [!TIP]  
+> If you use VS Code, there are tasks to emulate the CI/CT workflows.
+> In the command palette, select `Run Task`.
+> The tasks are prefixed with "VC:".
+> The "VC: Pipeline" task runs all the other tasks.
