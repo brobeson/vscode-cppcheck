@@ -1,14 +1,17 @@
 import * as vscode from "vscode";
 import * as cppcheck from "./cppcheck";
 
-function checkFile(fileUri: vscode.Uri,
+function checkFile(document: vscode.TextDocument,
   logChannel: vscode.OutputChannel,
   diagnostics: vscode.DiagnosticCollection) {
-  const command = cppcheck.makeCppcheckCommand(fileUri.fsPath);
+  if (document.languageId !== "cpp" && document.languageId !== "c") {
+    return;
+  }
+  const command = cppcheck.makeCppcheckCommand(document.uri.fsPath);
   cppcheck.runCppcheck(command, logChannel).then(
     (data: string) => {
-      diagnostics.delete(fileUri);
-      diagnostics.set(fileUri, cppcheck.parseIssues(data));
+      diagnostics.delete(document.uri);
+      diagnostics.set(document.uri, cppcheck.parseIssues(data));
     },
     () => {
       logChannel.appendLine("Failed");
@@ -34,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
   //   vscode.commands.registerCommand('cppcheck.scanProject', checkWholeProject))
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument((document) => {
-      checkFile(document.uri, logChannel, diagnostics);
+      checkFile(document, logChannel, diagnostics);
     }));
   // context.subscriptions.push(
   //   vscode.workspace.onDidSaveTextDocument(checkWholeProject));
