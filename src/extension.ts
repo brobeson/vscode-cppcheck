@@ -38,6 +38,9 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument((document) => {
       checkFile(document, logChannel, diagnostics);
+    }),
+    vscode.workspace.onDidOpenTextDocument((document) => {
+      checkFile(document, logChannel, diagnostics);
     }));
   // context.subscriptions.push(
   //   vscode.workspace.onDidSaveTextDocument(checkWholeProject));

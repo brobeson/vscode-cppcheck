@@ -8,6 +8,7 @@
 ### Added
 
 - Issue templates to report bugs and request new features ([#1](https://github.com/brobeson/vscode-cppcheck/issues/1))
+- Scan files when a user opens them ([#4](https://github.com/brobeson/vscode-cppcheck/issues/4))
 
 ### Fixed
 
