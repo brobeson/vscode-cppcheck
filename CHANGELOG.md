@@ -13,6 +13,8 @@
 ### Fixed
 
 - Only check C and C++ files ([#12](https://github.com/brobeson/vscode-cppcheck/issues/12))
+- Show an error message if Cppcheck output parsing fails ([#13](https://github.com/brobeson/vscode-cppcheck/issues/13))
+- Correctly parse Cppcheck output ([#13](https://github.com/brobeson/vscode-cppcheck/issues/13))
 
 ## [0.1.0](https://github.com/brobeson/vscode-cppcheck/releases/tag/v0.1.0) — 2023 December 30
 

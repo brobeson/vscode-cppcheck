@@ -51,8 +51,10 @@ export function runCppcheck(
         logChannel.appendLine(data as string);
       });
       process.stderr.on("data", (data) => {
-        logChannel.appendLine(data as string);
-        stderr += data;
+        let dataString = String(data);
+        dataString = dataString.replaceAll("\"", "\\\"").replaceAll("|||", "\"");
+        logChannel.appendLine(dataString);
+        stderr += dataString;
       });
       process.stderr.on("end", () => {
         // Chop off the trailing \n and , from the raw Cppcheck output, then
@@ -81,7 +83,7 @@ export function makeCppcheckCommand(file?: string) {
   const commandArguments = [
     "cppcheck",
     "--enable=all",
-    '--template={"file":"{file}","line":{line},"column":{column},"severity":"{severity}","message":"{message}","id":"{id}"},',
+    '--template={|||file|||:|||{file}|||,|||line|||:{line},|||column|||:{column},|||severity|||:|||{severity}|||,|||message|||:|||{message}|||,|||id|||:|||{id}|||},',
   ];
   // const configuration = vscode.workspace.getConfiguration("cppcheck");
   // if (configuration.has("commandArguments")) {
@@ -151,9 +153,18 @@ function createDiagnostic(issue: Issue) {
 }
 
 export function parseIssues(cppcheckJsonOutput: string) {
-  const issues = JSON.parse(cppcheckJsonOutput) as Issue[];
-  const diagnostics = issues.map(createDiagnostic);
-  return diagnostics;
+  try {
+    const issues = JSON.parse(cppcheckJsonOutput) as Issue[];
+    const diagnostics = issues.map(createDiagnostic);
+    return diagnostics;
+  } catch (error) {
+    if (error instanceof Error) {
+      // I don't care what the user does with the error message.
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      vscode.window.showErrorMessage(`An error occurred parsing the Cppcheck output. The error is '${error.message}'. The output is ${cppcheckJsonOutput}`);
+    }
+  }
+  return new Array<vscode.Diagnostic>();
 }
 
 /*
