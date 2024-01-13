@@ -125,7 +125,7 @@ function createFileDiagnostic(issue: Issue): DiagnosticTuple {
   const d = new vscode.Diagnostic(
     new vscode.Range(
       issue.line - 1,
-      issue.column,
+      Math.max(issue.column - 1, 0),
       issue.line - 1,
       Number.MAX_SAFE_INTEGER,
     ),

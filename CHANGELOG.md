@@ -16,6 +16,7 @@
 - Show an error message if Cppcheck output parsing fails ([#13](https://github.com/brobeson/vscode-cppcheck/issues/13))
 - Correctly parse Cppcheck output ([#13](https://github.com/brobeson/vscode-cppcheck/issues/13))
 - Correctly link diagnostics with files ([#14](https://github.com/brobeson/vscode-cppcheck/issues/14))
+- Fix editor squiggles for diagnostics ([#15](https://github.com/brobeson/vscode-cppcheck/issues/15))
 
 ## [0.1.0](https://github.com/brobeson/vscode-cppcheck/releases/tag/v0.1.0) — 2023 December 30
 
