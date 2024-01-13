@@ -118,7 +118,10 @@ interface Issue {
   id: string;
 }
 
-function createFileDiagnostic(issue: Issue) {
+// Just a convenience alias for this tuple type.
+type DiagnosticTuple = [vscode.Uri, vscode.Diagnostic[]];
+
+function createFileDiagnostic(issue: Issue): DiagnosticTuple {
   const d = new vscode.Diagnostic(
     new vscode.Range(
       issue.line - 1,
@@ -131,10 +134,10 @@ function createFileDiagnostic(issue: Issue) {
   );
   d.code = issue.id;
   d.source = "Cppcheck";
-  return d;
+  return [vscode.Uri.file(issue.file), [d]];
 }
 
-function createNoFileDiagnostic(issue: Issue) {
+function createNoFileDiagnostic(issue: Issue): DiagnosticTuple {
   const d = new vscode.Diagnostic(
     new vscode.Range(0, 0, 0, 0),
     issue.message,
@@ -142,7 +145,7 @@ function createNoFileDiagnostic(issue: Issue) {
   );
   d.code = issue.id;
   d.source = "cppcheck";
-  return d;
+  return [vscode.Uri.file("nofile"), [d]];
 }
 
 function createDiagnostic(issue: Issue) {
@@ -164,7 +167,7 @@ export function parseIssues(cppcheckJsonOutput: string) {
       vscode.window.showErrorMessage(`An error occurred parsing the Cppcheck output. The error is '${error.message}'. The output is ${cppcheckJsonOutput}`);
     }
   }
-  return new Array<vscode.Diagnostic>();
+  return null;
 }
 
 /*

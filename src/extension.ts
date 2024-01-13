@@ -11,7 +11,10 @@ function checkFile(document: vscode.TextDocument,
   cppcheck.runCppcheck(command, logChannel).then(
     (data: string) => {
       diagnostics.delete(document.uri);
-      diagnostics.set(document.uri, cppcheck.parseIssues(data));
+      const issues = cppcheck.parseIssues(data);
+      if (issues !== null) {
+        diagnostics.set(issues);
+      }
     },
     () => {
       logChannel.appendLine("Failed");
