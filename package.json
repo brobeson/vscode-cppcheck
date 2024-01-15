@@ -39,9 +39,15 @@
       }
     ],
     "configuration": {
-      "title": "cppcheck",
+      "title": "Cppcheck",
       "properties": {
+        "cppcheck.cppcheck": {
+          "description": "The path to the Cppcheck executable.",
+          "type": "string",
+          "default": "cppcheck"
+        },
         "cppcheck.elevateSeverity": {
+          "deprecationMessage": "This setting will be replaced with a more advanced setting in the future.",
           "type": "string",
           "description": "Elevate all Cppcheck messages to the specified level. Messages above this level are left alone.",
           "enum": [
@@ -57,6 +63,7 @@
           "default": "no elevation"
         },
         "cppcheck.commandArguments": {
+          "deprecationMessage": "This setting will be removed in the future.",
           "type": "array",
           "markdownDescription": "Command line arguments to pass to Cppcheck. **WARNING** This extension removes some arguments from the list. For example, `--template` is removed because the extension requires a specific template to parse the output.",
           "default": [

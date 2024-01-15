@@ -10,6 +10,7 @@ This is an extension for Visual Studio Code to run [Cppcheck](https://github.com
 
 - Runs Cppcheck when you save a C++ file.
 - Report issues as diagnostics in the Problems panel.
+- Check the [user guide](/UserGuide.md) for the [configuration settings](/UserGuide.md#configuration-settings).
 
 ## Requirements
 

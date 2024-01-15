@@ -68,7 +68,8 @@ export function runCppcheck(
         reject(err);
       });
     } else {
-      logChannel.appendLine("Error: Failed to run Cppcheck.");
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-non-null-assertion
+      vscode.window.showErrorMessage(`Failed to run ${command.at(0)!}`);
     }
   });
 }
@@ -81,7 +82,8 @@ export function runCppcheck(
  */
 export function makeCppcheckCommand(file?: string) {
   const commandArguments = [
-    "cppcheck",
+    // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+    vscode.workspace.getConfiguration("cppcheck").get("cppcheck") as string,
     "--enable=all",
     '--template={|||file|||:|||{file}|||,|||line|||:{line},|||column|||:{column},|||severity|||:|||{severity}|||,|||message|||:|||{message}|||,|||id|||:|||{id}|||},',
   ];
